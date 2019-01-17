@@ -17,19 +17,19 @@ def main():
     y = data['winPlacePerc']
 
     regressor = RandomForestRegressor(random_state=RANDOM_STATE)
-    # params = {
-    #     'n_estimators': [1, 2, 4, 8, 16, 32, 64, 128],
-    #     'criterion': ['mse', 'mae'],
-    #     'max_depth': [None, 10, 100, 1000],
-    #     'min_samples_split': [2, 4, 8, 16],
-    #     'min_samples_leaf': [1, 2, 4, 8, 16],
-    #     'max_features': ['auto', 'sqrt', 'log2'],
-    #
-    # }
     params = {
-        'n_estimators': [16, 32],
-        'max_depth': [None, 10],
+        'n_estimators': [8, 16, 32, 64, 128],
+        'criterion': ['mse', 'mae'],
+        'max_depth': [None, 10, 100, 1000],
+        'min_samples_split': [2, 4, 8, 16],
+        'min_samples_leaf': [1, 2, 4, 8, 16],
+        'max_features': ['auto', 'sqrt', 'log2'],
+
     }
+    # params = {
+    #     'n_estimators': [16, 32],
+    #     'max_depth': [None, 10],
+    # }
 
     scorer = make_scorer(mean_absolute_error)
     grid = GridSearchCVProgressBar(regressor, params, scoring=scorer, cv=5, n_jobs=-1)

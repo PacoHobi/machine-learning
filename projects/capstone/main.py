@@ -1,10 +1,6 @@
 from time import time
 
 import pandas as pd
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble import BaggingRegressor
-from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
@@ -21,21 +17,14 @@ def main():
     configurations = [
         {
             'steps': [
-            ],
-            'regressor_class': GradientBoostingRegressor
-        },
-        {
-            'steps': [
-                preprocessing.remove_outliers,
-            ],
-            'regressor_class': GradientBoostingRegressor
-        },
-        {
-            'steps': [
                 preprocessing.remove_outliers,
                 preprocessing.scale_skewed_features,
+                preprocessing.min_max_scale,
             ],
-            'regressor_class': GradientBoostingRegressor
+            'regressor': {
+                'class': RandomForestRegressor,
+                'kwargs': {}
+            }
         },
         {
             'steps': [
@@ -43,27 +32,14 @@ def main():
                 preprocessing.scale_skewed_features,
                 preprocessing.min_max_scale,
             ],
-            'regressor_class': GradientBoostingRegressor
+            'regressor': {
+                'class': RandomForestRegressor,
+                'kwargs': {
+                    'n_estimators': 16,
+                    'max_depth': 10
+                }
+            }
         },
-        {
-            'steps': [
-                preprocessing.scale_skewed_features,
-                preprocessing.min_max_scale,
-            ],
-            'regressor_class': GradientBoostingRegressor
-        },
-        {
-            'steps': [
-                preprocessing.min_max_scale,
-            ],
-            'regressor_class': GradientBoostingRegressor
-        },
-        {
-            'steps': [
-                preprocessing.scale_skewed_features,
-            ],
-            'regressor_class': GradientBoostingRegressor
-        }
     ]
 
     for configuration in configurations:
@@ -91,14 +67,18 @@ def run_configuration(data, configuration):
     )
 
     # Initialize classifier
-    regressor_class = configuration['regressor_class']
-    regressor = regressor_class(random_state=RANDOM_STATE)
+    reg_cls = configuration['regressor']['class']
+    reg_kwargs = configuration['regressor']['kwargs']
+    regressor = reg_cls(random_state=RANDOM_STATE, **reg_kwargs)
 
     results = train_predict(regressor, X_train, y_train, X_test, y_test)
 
+    kwargs_str = ', '.join(f'{name}={value}' for name, value in reg_kwargs.items())
+    reg_str = f'{reg_cls.__name__}({kwargs_str})'
+
     print(
         '--------------------------------------\n'
-        f'Regressor class: {regressor_class.__name__}\n'
+        f'Regressor:       {reg_str}\n'
         f'Preprocessing:   {", ".join(step.__name__ for step in steps)}\n'
         f'Train time:      {results["train_time"]:f}\n'
         f'Prediction time: {results["pred_time"]:f}\n'
