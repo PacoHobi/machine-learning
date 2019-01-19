@@ -2,6 +2,7 @@ import math
 
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
 
 
@@ -25,3 +26,12 @@ def distplot_all_cols(*dfs, num_cols=4, bins=None, columns=None):
             g.set(xticklabels=[], yticklabels=[])
 
     plt.show()
+
+
+def prediction_scatterplot():
+    df = pd.read_csv('../../pred.csv')
+    sns.scatterplot('y', 'pred', data=df)
+
+
+if __name__ == '__main__':
+    prediction_scatterplot()

@@ -1,11 +1,11 @@
 from time import time
 
-import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import AdaBoostRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 from utils import preprocessing
+from utils.data import load_data
 
 RANDOM_STATE = 1
 DATASET_FILE = 'data/pubg_dataset.csv'
@@ -17,38 +17,19 @@ def main():
     configurations = [
         {
             'steps': [
-                preprocessing.remove_outliers,
-                preprocessing.scale_skewed_features,
-                preprocessing.min_max_scale,
+                # preprocessing.remove_outliers,
+                # preprocessing.scale_skewed_features,
+                # preprocessing.min_max_scale,
             ],
             'regressor': {
-                'class': RandomForestRegressor,
+                'class': AdaBoostRegressor,
                 'kwargs': {}
-            }
-        },
-        {
-            'steps': [
-                preprocessing.remove_outliers,
-                preprocessing.scale_skewed_features,
-                preprocessing.min_max_scale,
-            ],
-            'regressor': {
-                'class': RandomForestRegressor,
-                'kwargs': {
-                    'n_estimators': 16,
-                    'max_depth': 10
-                }
             }
         },
     ]
 
     for configuration in configurations:
         run_configuration(data, configuration)
-
-
-def load_data():
-    df = pd.read_csv(DATASET_FILE)
-    return df
 
 
 def run_configuration(data, configuration):
