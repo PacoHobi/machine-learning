@@ -10,7 +10,7 @@ SKEWED = ['boosts', 'damageDealt', 'headshotKills', 'heals', 'kills', 'killStrea
 
 
 def remove_outliers(df):
-    new_df = df.copy()
+    new_df = df.copy().reset_index(drop=True)
 
     outliers_counter = Counter()
 
@@ -32,21 +32,28 @@ def remove_outliers(df):
 
     # Remove the outliers
     new_df.drop(new_df.index[outliers], inplace=True)
+    new_df.reset_index(drop=True)
 
     return new_df
 
 
 def scale_skewed_features(df):
     new_df = df.copy()
+
+    # Apply Box-Cox to the skewed features
     new_df[SKEWED] = new_df[SKEWED].apply(lambda x: stats.boxcox(x + 1)[0])
+
     return new_df
 
 
 def min_max_scale(df):
     new_df = df.copy()
 
-    scaler = MinMaxScaler()
+    # Don't scale the winPlacePerc
     columns = new_df.columns[:-1]
+
+    # Scale all features
+    scaler = MinMaxScaler()
     new_df[columns] = scaler.fit_transform(new_df[columns])
 
     return new_df
